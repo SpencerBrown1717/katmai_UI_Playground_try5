@@ -718,4 +718,79 @@
         document.addEventListener('DOMContentLoaded', () => {
             // Cache DOM elements for better performance
             const sidebarHeaders = document.querySelectorAll('.sidebar-header');
-            const menuItems =
+            const menuItems = document.querySelectorAll('.sidebar-menu li');
+            const enrollButton = document.querySelector('.enrollment-button');
+            const anchors = document.querySelectorAll('a[href^="#"]');
+            
+            // Sidebar toggle functionality
+            sidebarHeaders.forEach(header => {
+                const content = header.nextElementSibling;
+                const icon = header.querySelector('.collapsed-icon');
+                
+                if (!content || !icon) return; // Guard clause for missing elements
+                
+                // Set initial state
+                content.style.display = 'block';
+                
+                header.addEventListener('click', () => {
+                    const isCollapsed = content.style.display === 'none';
+                    content.style.display = isCollapsed ? 'block' : 'none';
+                    icon.style.transform = isCollapsed ? 'rotate(0deg)' : 'rotate(-90deg)';
+                });
+            });
+
+            // Add active class handling for sidebar menu items
+            const setActiveMenuItem = (targetItem) => {
+                menuItems.forEach(i => i.classList.remove('active'));
+                targetItem.classList.add('active');
+            };
+
+            menuItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    if (e.target === this) e.preventDefault();
+                    setActiveMenuItem(this);
+                });
+            });
+
+            // Smooth scroll to anchor links with error handling
+            anchors.forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const targetId = this.getAttribute('href');
+                    if (!targetId) return; // Guard clause for missing href
+                    
+                    const targetElement = document.querySelector(targetId);
+                    
+                    if (targetElement) {
+                        try {
+                            targetElement.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'start'
+                            });
+                            
+                            const parentLi = this.closest('li');
+                            if (parentLi) setActiveMenuItem(parentLi);
+                        } catch (error) {
+                            console.error('Error scrolling to element:', error);
+                            // Fallback to regular scroll if smooth scroll fails
+                            window.scrollTo(0, targetElement.offsetTop);
+                        }
+                    }
+                });
+            });
+
+            // Initialize enrollment button with error handling
+            if (enrollButton) {
+                enrollButton.addEventListener('click', function() {
+                    try {
+                        alert('Thank you for your interest! Enrollment functionality coming soon.');
+                    } catch (error) {
+                        console.error('Error handling enrollment click:', error);
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
